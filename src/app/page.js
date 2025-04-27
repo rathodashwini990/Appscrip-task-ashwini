@@ -1,16 +1,38 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ProductCard from "./components/ProductCard";
 import FilterBar from "./components/FilterBar";
 
-async function getProducts() {
-  const res = await axios.get('https://fakestoreapi.com/products');
-  return res.data;
-}
+export default function Home() {
+  const [products, setProducts] = useState([]);
+  const [sortOption, setSortOption] = useState("recommended");
 
-export default async function Home() {
-  const products = await getProducts();
+  useEffect(() => {
+    async function fetchProducts() {
+      const res = await axios.get('https://fakestoreapi.com/products');
+      setProducts(res.data);
+    }
+    fetchProducts();
+  }, []);
+
+  const sortProducts = (products) => {
+    switch (sortOption) {
+      case "lowToHigh":
+        return [...products].sort((a, b) => a.price - b.price);
+      case "highToLow":
+        return [...products].sort((a, b) => b.price - a.price);
+      case "newest":
+        return [...products].sort((a, b) => b.id - a.id);
+      case "popular":
+        return [...products].sort((a, b) => a.rating.count - b.rating.count);
+      default:
+        return products;
+    }
+  };
 
   return (
     <div>
@@ -18,9 +40,9 @@ export default async function Home() {
       <main className="container">
         <h1>Discover Our Products</h1>
         <p>Lorem ipsum dolor sit amet consectetur. Amet est posuere rhoncus scelerisque.</p>
-        <FilterBar />
+        <FilterBar sortOption={sortOption} setSortOption={setSortOption} />
         <div className="products-grid">
-          {products.map(product => (
+          {sortProducts(products).map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
