@@ -10,6 +10,8 @@ import FilterBar from "./components/FilterBar";
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [sortOption, setSortOption] = useState("recommended");
+  const [isFilterVisible, setIsFilterVisible] = useState(true);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -18,6 +20,10 @@ export default function Home() {
     }
     fetchProducts();
   }, []);
+
+  const toggleFilter = () => {
+    setIsFilterVisible(!isFilterVisible);
+  };
 
   const sortProducts = (products) => {
     switch (sortOption) {
@@ -28,11 +34,31 @@ export default function Home() {
       case "newest":
         return [...products].sort((a, b) => b.id - a.id);
       case "popular":
-        return [...products].sort((a, b) => a.rating.count - b.rating.count);
+        return [...products].sort((a, b) => b.rating.count - a.rating.count);
       default:
         return products;
     }
   };
+
+  const handleCategoryChange = (category) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter((c) => c !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  const filteredProducts = () => {
+    let tempProducts = sortProducts(products);
+    if (selectedCategories.length > 0) {
+      tempProducts = tempProducts.filter(product =>
+        selectedCategories.includes(product.category)
+      );
+    }
+    return tempProducts;
+  };
+
+  const uniqueCategories = [...new Set(products.map(p => p.category))];
 
   return (
     <div>
@@ -41,11 +67,36 @@ export default function Home() {
         <h1>Discover Our Products</h1>
         <p>Lorem ipsum dolor sit amet consectetur. Amet est posuere rhoncus scelerisque.<br />
         Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea.</p>
-        <FilterBar sortOption={sortOption} setSortOption={setSortOption} />
-        <div className="products-grid">
-          {sortProducts(products).map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+
+        <FilterBar
+          sortOption={sortOption}
+          setSortOption={setSortOption}
+          isFilterVisible={isFilterVisible}
+          toggleFilter={toggleFilter}
+        />
+
+        <div className="products-section">
+          {isFilterVisible && (
+            <aside className="sidebar">
+              <h3>Category</h3>
+              {uniqueCategories.map((category) => (
+                <label key={category}>
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category)}
+                    onChange={() => handleCategoryChange(category)}
+                  />
+                  {category}
+                </label>
+              ))}
+            </aside>
+          )}
+
+          <div className="products-grid">
+            {filteredProducts().map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         </div>
       </main>
       <Footer />

@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 
-export default function FilterBar({ sortOption, setSortOption }) {
+export default function FilterBar({ sortOption, setSortOption, isFilterVisible, toggleFilter }) {
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
   };
 
   return (
     <div className="filter-bar">
+      <button onClick={toggleFilter} className="filter-toggle-btn">
+        {isFilterVisible ? "Hide Filters" : "Show Filters"}
+      </button>
       <select className="sort-select" value={sortOption} onChange={handleSortChange}>
         <option value="recommended">Recommended</option>
         <option value="newest">Newest First</option>
