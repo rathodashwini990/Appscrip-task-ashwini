@@ -39,7 +39,8 @@ export default function Home() {
       <Header />
       <main className="container">
         <h1>Discover Our Products</h1>
-        <p>Lorem ipsum dolor sit amet consectetur. Amet est posuere rhoncus scelerisque.</p>
+        <p>Lorem ipsum dolor sit amet consectetur. Amet est posuere rhoncus scelerisque.<br />
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea.</p>
         <FilterBar sortOption={sortOption} setSortOption={setSortOption} />
         <div className="products-grid">
           {sortProducts(products).map(product => (
